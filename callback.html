@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- This page only reads its own URL. The policy below blocks every network request, and no-referrer keeps the
+     code out of any Referer header. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'unsafe-inline'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>TikTok sign-in · Behind the Brand Publisher</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>TikTok authorization</h1>
+  <p class="muted">Copy the code below into the Behind the Brand setup. This page sends nothing anywhere; the code
+    stays in your browser. It expires within minutes, so use it right away.</p>
+  <div id="out"></div>
+  <noscript><p>Turn on JavaScript to show the code, or copy the <code>code=</code> part of this page's address.</p></noscript>
+</main>
+<script>
+  const q = new URLSearchParams(location.search);
+  const out = document.getElementById('out');
+  const add = (label, value) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const h = document.createElement('strong');
+    h.textContent = label;
+    const v = document.createElement('span');
+    v.className = 'value';
+    v.textContent = value;
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = 'Copy';
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(value); b.textContent = 'Copied ✓'; }
+      catch { getSelection().selectAllChildren(v); b.textContent = 'Selected: press Ctrl/⌘ + C'; }
+    };
+    card.append(h, v, b);
+    out.append(card);
+  };
+  if (q.get('error')) {
+    add('TikTok returned an error', q.get('error') + (q.get('error_description') ? ': ' + q.get('error_description') : ''));
+  }
+  if (q.get('code')) add('code', q.get('code'));
+  if (q.get('state')) add('state', q.get('state'));
+  if (q.get('scopes')) add('scopes', q.get('scopes'));
+  if (!q.get('code') && !q.get('error')) {
+    const p = document.createElement('p');
+    p.textContent = 'No code in this address. Start the sign-in from TikTok again.';
+    out.append(p);
+  }
+</script>
+</body>
+</html>
